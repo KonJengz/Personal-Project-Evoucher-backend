@@ -1,0 +1,21 @@
+--- REGISTER ADMIN ---
+POST /admin/register
+BODY
+    username
+    password
+    confirmPassword
+RES
+    201 message
+    400 message
+    500 message
+
+--- LOGIN ADMIN ---
+POST /admin/login
+BODY
+    email
+    password
+    confirmPassword
+RES
+    200 message
+    400 message
+    500 message

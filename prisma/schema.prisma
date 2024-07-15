@@ -1,0 +1,104 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Admin {
+  id            Int           @id @default(autoincrement())
+  username      String        @db.VarChar(40) @unique
+  password      String        @db.VarChar(255)
+}
+
+
+model User {
+    id            Int           @id @default(autoincrement())
+    email         String        @db.VarChar(50) @unique
+    password      String        @db.VarChar(255)
+    statusSendEmail   Boolean   @default(true)
+    statusUser   Boolean        @default(true)
+    phone         String        @db.VarChar(10)
+    createdAt     DateTime      @default(now()) @db.Timestamp(0)
+    updatedAt     DateTime      @updatedAt @db.Timestamp(0)
+
+    stores        Store[]
+}
+
+
+model Store {
+  id                Int           @id @default(autoincrement())
+  profileImage      String?
+  lineShoppingUrl   String?       @unique
+  secretKeyApi      String?
+  ApiKey            String?
+  webHookForOpenApi String?
+  nameStore         String        @unique
+  totalCountSendVoucher  Int?
+  createdAt         DateTime      @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime      @updatedAt @db.Timestamp(0)
+  emailStore        String?
+  phoneStore        String?
+
+
+  evoucher          Evoucher[]
+  userId            Int
+
+  user              User          @relation(fields: [userId], references: [id])
+  historySendVoucher HistorySendVoucher[]
+}
+
+
+model HistorySendVoucher {
+  id                Int           @id @default(autoincrement())
+  countByMonth      Int
+  month             String
+  years             Int           @db.Year
+
+  storeId           Int
+
+  store             Store @relation(fields: [storeId], references: [id])
+}
+
+
+model Evoucher {
+  id                Int           @id @default(autoincrement())
+  nameVoucher       String?
+  numberVoucher     Int           @unique
+  detailVoucher     String?
+  startDate         DateTime?     @db.Date          
+  endDate           DateTime?     @db.Date
+  createdAt         DateTime      @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime      @updatedAt @db.Timestamp(0)
+  countSendVoucher  Int?
+  imageVoucher      String?
+  statusVoucher     Boolean       @default(false)
+
+  storeId           Int
+  orderVoucher      OrderVoucher[]
+  store             Store       @relation(fields: [storeId], references: [id])
+  
+}
+
+
+model OrderVoucher {
+  id                Int           @id @default(autoincrement())
+  timeSendEmail     DateTime     @default(now()) @db.Timestamp(0)
+  timeSendLine      DateTime      @default(now()) @db.Timestamp(0)
+  statusUseVoucher  Boolean       @default(false)
+  createdAt         DateTime      @default(now()) @db.Timestamp(0)
+  updatedAt         DateTime      @updatedAt @db.Timestamp(0)
+  nameEnduser       String?
+  emailEnduser      String?
+  idLineUser        String?
+  orderNumber       String?
+
+  voucherId         Int
+  branchId          String?
+  evoucher          Evoucher       @relation(fields: [voucherId], references: [numberVoucher])
+
+}
